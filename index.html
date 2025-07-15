@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8" />
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+    <!-- Estas lineas son para que funcione en GitHub -->
+    <link rel="stylesheet" href="https://librekcesar.github.io/busca_zipcodes4/leaflet-search-master/leaflet-search-master/src/leaflet-search.css" />
+    <script src="https://librekcesar.github.io/busca_zipcodes4/leaflet-search-master/leaflet-search-master/src/leaflet-search.js"></script>
+    <style>
+        #map {
+            width: 100%;
+            height: 900px;
+        }
+
+            #map-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            /* Asegúrate de que este background-color sea válido, rgba(r,g,b,a) */
+            background-color: rgba(255, 255, 255, 0.8); /* Ejemplo de blanco semitransparente */
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 25px;
+            z-index: 1000;
+        }
+
+
+        .leaflet-control-search {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+        
+#map-legend {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: white;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.5em;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+    }
+    </style>
+</head>
+<body>
+    <div id="map-title"> Ruta VSA1-SPCAM1-SPYUC1</div>
+    <div id="map"></div>
+    <div id="map-legend" class="legend">
+        <h4>Leyenda</h4>
+        <div><span style="background-color: #d8180c; width: 20px; height: 20px; display: inline-block; border-radius: 50%;"></span> Nivel de riesgo de ruta (Alto)</div>
+        <div><span style="background-color: #c8a207; width: 20px; height: 20px; display: inline-block; border-radius: 50%;"></span> Nivel de riesgo de ruta (Medio) </div>
+        <div><span style="background-color: #3fd80c; width: 20px; height: 20px; display: inline-block; border-radius: 50%;"></span> Nivel de riesgo de ruta (Bajo) </div>
+    </div>
+
+    <!-- Descomentar este bloque de código en el github -->
+    <script src="https://unpkg.com/leaflet@1.3.0/dist/leaflet.js"></script>
+    <script src="https://librekcesar.github.io/busca_zipcodes4/leaflet-search-master/leaflet-search-master/src/leaflet-search.js"></script>
+    <script src="nombre_RUTA_VSA1_CAM1_YUC1_copia.js"></script> <!-- GeoJSON de la primera capa de puntos -->
+    
+    <script src="estaciones_vsa1_spcam_spyuc_copia.js"></script> <!-- GeoJSON de la tercera capa de puntos -->
+    <script src="paradas_vsa1_spcam_spyuc_copia.js"></script>
+    <script src="entidades_mex_simpl_copia.js"></script>
+    
+
+    <script>
+    // Suponiendo que 'centroidemx4.js' define una variable 'cenmx4' con el GeoJSON de la primera capa de puntos
+    var puntos1 = estaciones;
+    // Suponiendo que 'puntos_geojson_2.js' define una variable 'puntos2' con el GeoJSON de la segunda capa de puntos
+    var puntos2 = seguras;
+    // Suponiendo que 'puntos_geojson_3.js' define una variable 'puntos3' con el GeoJSON de la tercera capa de puntos
+    
+    // Suponiendo que 'lineas_geojson_1.js' define una variable 'lineas1' con el GeoJSON de la primera capa de líneas
+    var lineas1 = ruta_mx0vsacam;
+    // Suponiendo que 'lineas_geojson_2.js' define una variable 'lineas2' con el GeoJSON de la segunda capa de líneas
+    
+    // Suponiendo que 'lineas_geojson_3.js' define una variable 'lineas3' con el GeoJSON de la tercera capa de líneas
+
+    var poligono1 = mex;
+   
+     //
+    
+    //
+        function getColor(riesgo) {
+            switch (riesgo) {
+                case 'Alto': return '#d8180c';
+                case 'Medio': return '#c8a207';
+                case 'Bajo': return '#3fd80c';
+                default: return '#a08c8a';
+            }
+        }
+
+        function style(feature) {
+            return {
+                fillColor: getColor(feature.properties.riesgo),
+                weight: 1,
+                opacity: 1,
+                color: 'black',
+                dashArray: '2',
+                fillOpacity: 0.5
+            };
+        }
+
+        function onEachFeature(feature, layer) {
+            if (feature.properties) {
+                layer.bindPopup('<p> Estado: ' + feature.properties.NOM_ENT + '</p><p>Otro: ' + feature.properties.NOMGEO + '</p><p>Nivel de riesgo: ' + feature.properties.riesgo  + '</p><p>Localidad: ' + feature.properties.locality + '</p>');
+            }
+        }
+
+        var layerGroup = L.geoJSON(mex, {
+            style: style,
+            onEachFeature: onEachFeature
+        });
+
+
+    //
+    
+
+    // Crear el mapa centrado en una ubicación específica
+    var map = new L.Map('map', {zoom: 7, center: new L.latLng([19.327695, -90.771366]) });
+
+    // Añadir capa de tiles al mapa
+    map.addLayer(new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'));
+
+    // Función para crear capas de puntos
+    function crearCapaPuntos(data, fillColor) {
+    return new L.GeoJSON(data, {
+        pointToLayer: function (feature, latlng) {
+            // Define un icono personalizado con CSS para que sea un cuadrado
+            var squareIcon = L.divIcon({
+                className: 'custom-square-icon', // Clase CSS para el estilo
+                iconSize: [20, 20],              // Tamaño del cuadrado (ancho, alto)
+                html: '<div style="background-color: ' + fillColor + '; border: 1px solid #040305; width: 100%; height: 100%;"></div>'
+            });
+
+            return L.marker(latlng, { icon: squareIcon });
+        },
+        onEachFeature: function (feature, layer) {
+            var popupContent = '<h4 style="color:' + (feature.properties.color || 'black') + '">' + // Agregué || 'black' para robustez
+                               'Nombre: ' + (feature.properties.description || 'N/D') + '</h4>' +
+                               'Dirección: ' + (feature.properties.Name || 'N/D') + '</h4>' + ' ' +
+                               'Otros: ' + (feature.properties.direccion || 'N/D');
+            layer.bindPopup(popupContent);
+        }
+    });
+}
+
+// Crear las capas de puntos
+var capaPuntos1 = crearCapaPuntos(puntos1, "#c40dbe");
+
+
+    //Segunda capa de puntos
+ function crearCapaPuntos2(data, fillColor) {
+        return new L.GeoJSON(data, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: 10,
+                    fillColor: fillColor,
+                    color: "#040305",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.7
+                });
+            },
+            onEachFeature: function (feature, layer) {
+                var popupContent = '<h4 style="color:' + feature.properties.color + '">' +
+                                   'Nombre de estación: ' + feature.properties.Name + '</h4>' +
+                                   'Dirección: ' + feature.properties.description + '</h4>' + ' ' +
+                                   'Tipo: ' + feature.properties.t_estacion;
+                layer.bindPopup(popupContent);
+            }
+        });
+    }
+
+    // Crear las capas de puntos
+    var capaPuntos2 = crearCapaPuntos2(puntos2, "#13eab9");
+    
+
+    // Función para crear capas de líneas
+    function crearCapaLineas(data, fillColor) {
+        return new L.GeoJSON(data, {
+            style: function (feature) {
+                return {
+                    color: fillColor,
+                    weight: 6,
+                    opacity: 1
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                var popupContent = '<h4 style="color:' + feature.properties.color + '">' +
+                                   'Nombre: ' + feature.properties.Name + '</h4>' +
+                                   'Tiempo de ruta: ' + feature.properties.t_ruta + '</h4>' +
+                                   'Nivel de riesgo: ' + feature.properties.t_riesgo;
+                layer.bindPopup(popupContent);
+            }
+        });
+    }
+
+    // Crear las capas de líneas
+    var capaLineas1 = crearCapaLineas(lineas1, "#c8a207");
+    
+   
+    
+
+    //////
+
+
+    ////
+   
+
+    // Añadir las capas al mapa
+    map.addLayer(capaPuntos1);
+    map.addLayer(capaPuntos2);
+    
+    map.addLayer(capaLineas1);
+    
+
+    // Añadir control de capas
+    var overlays = {
+        "Estaciones VSA1-SPCAM1-SPYUC1": capaPuntos1,
+        "Paradas seguras VSA1-SPCAM1-SPYUC1": capaPuntos2,
+       
+        "Ruta VSA1-SPCAM1-SPYUC1": capaLineas1,
+        "nivel de riesgo por entidad": layerGroup
+    
+       
+    };
+
+    L.control.layers(null, overlays, {collapsed: false}).addTo(map);
+    </script>
+</body>
+</html>
