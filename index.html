@@ -47,11 +47,33 @@
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
         z-index: 1000;
     }
+     #google-maps-button {
+    position: absolute;
+    top: 200px; /*ajustar para que no choque con los otros elementos*/
+    right: 20px;
+    background-color: #4285F4;
+    color: rgb(235, 232, 213);
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none; /* Quita el subrayado del enlace */
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    z-index: 1000; /* Asegura que esté por encima del mapa */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease; /* Efecto suave al pasar el mouse */
+    }
+
+    #google-maps-button:hover {
+        background-color: #104396; /* Un azul ligeramente más oscuro al pasar el mouse */
+    }    
     </style>
 </head>
 <body>
     <div id="map-title"> Ruta VSA1-SPCAM1-SPYUC1</div>
     <div id="map"></div>
+    <a href="https://www.google.com/maps/dir/C.+Miguel+Hidalgo+y+Costilla+245,+Tamulte+de+las+Barrancas,+86150+Villahermosa,+Tab./Av.+Antigua+Kal%C3%A1+6,+Zona+Sin+Asignaci%C3%B3n+de+Nombre,+24087+San+Francisco+de+Campeche,+Camp./Kanas%C3%ADn,+Yucat%C3%A1n/@19.4394604,-93.9018325,840949m/data=!3m2!1e3!4b1!4m20!4m19!1m5!1m1!1s0x85edd773235d335f:0x36e7ca4358fb5aa5!2m2!1d-92.956526!2d17.969967!1m5!1m1!1s0x85f8312b3ee095cf:0x3b3561be77aa163b!2m2!1d-90.4913172!2d19.8528685!1m5!1m1!1s0x8f567060d346483b:0x5eda99e1c0a2b4ac!2m2!1d-89.5639119!2d20.9441486!3e0!5m1!1e3?entry=ttu&g_ep=EgoyMDI1MDcyNy4wIKXMDSoASAFQAw%3D%3D" target="_blank" id="google-maps-button">
+        Ver en Google Maps
+    </a>
     <div id="map-legend" class="legend">
         <h4>Leyenda</h4>
         <div><span style="background-color: #d8180c; width: 20px; height: 20px; display: inline-block; border-radius: 50%;"></span> Nivel de riesgo de ruta (Alto)</div>
